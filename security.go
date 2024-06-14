@@ -24,6 +24,10 @@ func findSecurityConfInStruct(v interface{}) (SecurityConf, bool) {
 		if field.Type == reflect.TypeOf(SecurityConf{}) {
 			return reflect.ValueOf(v).FieldByIndex(field.Index).Interface().(SecurityConf), true
 		}
+		conf, ok := findSecurityConfInStruct(reflect.ValueOf(v).FieldByIndex(field.Index).Interface())
+		if ok {
+			return conf, true
+		}
 	}
 	return SecurityConf{}, false
 }
