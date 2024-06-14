@@ -14,20 +14,10 @@ type SecurityConf struct {
 	Env    string `json:",default=CONFIG_KEY"` // environment variable name stores the encryption key
 }
 
-func findSecurityConfInStruct(v interface{}) (SecurityConf, bool) {
-	if reflect.ValueOf(v).Kind() == reflect.Ptr {
-		v = reflect.ValueOf(v).Elem().Interface()
-	}
-	t := reflect.TypeOf(v)
-	for i := 0; i < t.NumField(); i++ {
-		field := t.Field(i)
-		if field.Type == reflect.TypeOf(SecurityConf{}) {
-			return reflect.ValueOf(v).FieldByIndex(field.Index).Interface().(SecurityConf), true
-		}
-		conf, ok := findSecurityConfInStruct(reflect.ValueOf(v).FieldByIndex(field.Index).Interface())
-		if ok {
-			return conf, true
-		}
+func findSecurityConfInStruct(o interface{}) (_ SecurityConf, success bool) {
+	v, ok := recursive(reflect.ValueOf(o))
+	if ok {
+		return v.Interface().(SecurityConf), true
 	}
 	return SecurityConf{}, false
 }

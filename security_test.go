@@ -55,13 +55,14 @@ func TestSecurityLoadRecursive(t *testing.T) {
 	key := "testkey"
 	type NestedConfig struct {
 		Security confz.SecurityConf
+		Test     string `json:"test,default=test"`
 	}
 	type testConfig struct {
-		NestedConfig
-
 		User   string `json:"user"`
 		Pass   string `json:"pass"`
 		Secret string `json:"secret"`
+
+		NestedConfig
 	}
 	expected := testConfig{
 		NestedConfig: NestedConfig{
