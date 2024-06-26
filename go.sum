@@ -1,5 +1,5 @@
-github.com/WqyJh/confcrypt v0.1.0 h1:fsVtVXcKIc4oGVwvijIHSFlAdpoAjZaHLx12Hh6//+0=
-github.com/WqyJh/confcrypt v0.1.0/go.mod h1:f6DFx0FNr/TDAeTtSrtwQ85d++pLm+9QqBgfRFdLfQo=
+github.com/WqyJh/confcrypt v0.2.1 h1:8a36LGS+vjs/gzsrLGIrph615bXP4zuHpxROoA6+/so=
+github.com/WqyJh/confcrypt v0.2.1/go.mod h1:f6DFx0FNr/TDAeTtSrtwQ85d++pLm+9QqBgfRFdLfQo=
 github.com/creack/pty v1.1.9/go.mod h1:oKZEueFk5CKHvIhNR5MUki03XCEU+Q6VDXinZuGJ33E=
 github.com/davecgh/go-spew v1.1.0/go.mod h1:J7Y8YcW2NihsgmVo/mv3lAwl/skON4iLHjSsI+c5H38=
 github.com/davecgh/go-spew v1.1.1 h1:vj9j/u1bqnvCEfJOwUhtlOARqs3+rkHYY13jYWTU97c=

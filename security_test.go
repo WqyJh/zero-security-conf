@@ -46,7 +46,7 @@ func TestSecurityLoad(t *testing.T) {
 	err = confz.SecurityLoad(tmpfile, &config)
 	assert.Nil(t, err)
 	assert.NotEqual(t, encryptedPass, config.Pass)
-	assert.NotEqual(t, encryptedPass, config.Secret)
+	assert.NotEqual(t, encryptedSecret, config.Secret)
 	assert.Equal(t, expected.Pass, config.Pass)
 	assert.Equal(t, expected.Secret, config.Secret)
 }
@@ -93,9 +93,88 @@ func TestSecurityLoadRecursive(t *testing.T) {
 	err = confz.SecurityLoad(tmpfile, &config)
 	assert.Nil(t, err)
 	assert.NotEqual(t, encryptedPass, config.Pass)
-	assert.NotEqual(t, encryptedPass, config.Secret)
+	assert.NotEqual(t, encryptedSecret, config.Secret)
 	assert.Equal(t, expected.Pass, config.Pass)
 	assert.Equal(t, expected.Secret, config.Secret)
+}
+
+func TestSecurityLoadDefault(t *testing.T) {
+	key := "testkey"
+	type testConfig struct {
+		User   string `json:"user"`
+		Pass   string `json:"pass"`
+		Secret string `json:"secret"`
+	}
+	expected := testConfig{
+		User:   "testuser",
+		Pass:   "testpass",
+		Secret: "testsecret",
+	}
+	encryptedPass, err := confcrypt.EncryptString(expected.Pass, key)
+	assert.Nil(t, err)
+	encryptedSecret, err := confcrypt.EncryptString(expected.Secret, key)
+	assert.Nil(t, err)
+	text := `{
+		"user": "testuser",
+		"pass": "` + encryptedPass + `",
+		"secret": "` + encryptedSecret + `"
+}`
+	tmpfile, err := createTempFile(".json", text)
+	assert.Nil(t, err)
+	defer os.Remove(tmpfile)
+
+	os.Setenv("CONFIG_KEY", key)
+	var config testConfig
+	err = confz.SecurityLoad(tmpfile, &config)
+	assert.Nil(t, err)
+	assert.NotEqual(t, encryptedPass, config.Pass)
+	assert.NotEqual(t, encryptedSecret, config.Secret)
+	assert.Equal(t, expected.Pass, config.Pass)
+	assert.Equal(t, expected.Secret, config.Secret)
+}
+
+func TestSecurityLoadDisable(t *testing.T) {
+	key := "testkey"
+	type testConfig struct {
+		Security confz.SecurityConf
+
+		User   string `json:"user"`
+		Pass   string `json:"pass"`
+		Secret string `json:"secret"`
+	}
+	expected := testConfig{
+		Security: confz.SecurityConf{
+			Enable: false,
+			Env:    "CONFIG_KEY",
+		},
+		User:   "testuser",
+		Pass:   "testpass",
+		Secret: "testsecret",
+	}
+	encryptedPass, err := confcrypt.EncryptString(expected.Pass, key)
+	assert.Nil(t, err)
+	encryptedSecret, err := confcrypt.EncryptString(expected.Secret, key)
+	assert.Nil(t, err)
+	text := `{
+		"Security": {
+			"Enable": false
+		},
+		"user": "testuser",
+		"pass": "` + encryptedPass + `",
+		"secret": "` + encryptedSecret + `"
+}`
+	tmpfile, err := createTempFile(".json", text)
+	assert.Nil(t, err)
+	defer os.Remove(tmpfile)
+
+	os.Setenv("CONFIG_KEY", key)
+	var config testConfig
+	err = confz.SecurityLoad(tmpfile, &config)
+	assert.Nil(t, err)
+	assert.Equal(t, encryptedPass, config.Pass)
+	assert.Equal(t, encryptedSecret, config.Secret)
+	assert.NotEqual(t, expected.Pass, config.Pass)
+	assert.NotEqual(t, expected.Secret, config.Secret)
 }
 
 func createTempFile(ext, text string) (string, error) {

@@ -2,7 +2,6 @@ package confz
 
 import (
 	"log"
-	"os"
 	"reflect"
 
 	"github.com/WqyJh/confcrypt"
@@ -27,17 +26,11 @@ func SecurityLoad(path string, v interface{}, opts ...conf.Option) error {
 		return err
 	}
 	c, ok := findSecurityConfInStruct(v)
-	if ok && c.Enable {
-		key := os.Getenv(c.Env)
-		decoded, err := confcrypt.Decode(v, key)
-		if err != nil {
-			return err
-		}
-		if reflect.TypeOf(v).Kind() == reflect.Ptr {
-			reflect.ValueOf(v).Elem().Set(reflect.ValueOf(decoded).Elem())
-			return nil
-		}
-		reflect.ValueOf(v).Set(reflect.ValueOf(decoded))
+	if !ok {
+		return confcrypt.DecodeByEnv(v)
+	}
+	if c.Enable {
+		return confcrypt.DecodeByEnv(v, confcrypt.WithEnv(c.Env))
 	}
 	return nil
 }
